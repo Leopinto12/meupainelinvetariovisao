@@ -3,98 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meu Painel de Inventário</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Organizador Pessoal | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #6366f1;
-            --bg: #0f172a;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.1);
+            --bg-body: #12141c;
+            --bg-card: #1c1f2a;
+            --accent: #3b82f6;
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --border: rgba(255, 255, 255, 0.05);
         }
 
-        body {
-            background-color: var(--bg);
-            color: white;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
+        /* Sidebar */
+        aside { width: 240px; background: #0f111a; border-right: 1px solid var(--border); padding: 30px 20px; display: flex; flex-direction: column; }
+        .logo { font-weight: 800; font-size: 1.2rem; margin-bottom: 40px; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+        nav a { color: var(--text-dim); text-decoration: none; padding: 12px; border-radius: 10px; display: block; margin-bottom: 5px; transition: 0.3s; cursor: pointer; }
+        nav a:hover, nav a.active { background: var(--accent); color: white; }
 
-        h1 { background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 30px; }
-
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-
-        .card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
-
-        input { background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 8px; width: 70%; outline: none; }
+        /* Main Content */
+        main { flex: 1; padding: 40px; overflow-y: auto; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         
-        button { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        /* Grid Layout */
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .section-card { background: var(--bg-card); border-radius: 20px; padding: 25px; border: 1px solid var(--border); }
+        .section-card h2 { font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
 
-        .file-item {
-            display: flex; align-items: center; gap: 15px; padding: 15px; 
-            background: rgba(255,255,255,0.05); border-radius: 12px;
-            margin-top: 15px; text-decoration: none; color: white; transition: 0.3s;
-        }
-        .file-item:hover { background: var(--primary); transform: translateY(-3px); }
+        /* Estilo Itens */
+        .item-list { display: flex; flex-direction: column; gap: 12px; }
+        .list-entry { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid transparent; }
+        .list-entry:hover { border-color: var(--accent); }
+        .entry-info strong { display: block; font-size: 0.9rem; }
+        .entry-info span { font-size: 0.75rem; color: var(--text-dim); }
 
-        ul { list-style: none; padding: 0; margin-top: 20px; }
-        li { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        /* Inputs Modernos */
+        .input-box { display: flex; gap: 10px; margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 12px; }
+        input, textarea { background: transparent; border: none; color: white; flex: 1; outline: none; padding: 8px; }
+        button { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+
+        .tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>meupainelinventariovisao</h1>
-        
-        <div class="grid">
-            <div class="card">
-                <h2>📅 Cronograma</h2>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="taskInput" placeholder="Nova tarefa...">
-                    <button onclick="addTask()">Add</button>
-                </div>
-                <ul id="taskList"></ul>
-            </div>
+    <aside>
+        <div class="logo">💡 Organizador</div>
+        <nav>
+            <a onclick="showTab('dashboard')" class="active">📊 Dashboard</a>
+            <a onclick="showTab('arquivos')">📁 Arquivos</a>
+            <a onclick="showTab('notas')">📝 Notas</a>
+            <a onclick="showTab('cronograma')">📅 Cronograma</a>
+        </nav>
+    </aside>
 
-            <div class="card">
-                <h2>📊 Meus Excels (Storage)</h2>
-                <p style="font-size: 0.8rem; color: #94a3b8;">Arquivos salvos externamente:</p>
-                
-                <a href="COLE_AQUI_O_LINK_DO_SEU_STORAGE" class="file-item" target="_blank">
-                    <span>📗</span>
-                    <div>
-                        <strong>Planilha de Inventário</strong><br>
-                        <small>Link Externo</small>
-                    </div>
-                </a>
+    <main id="main-view">
+        <div class="top-bar">
+            <div>
+                <h1 id="greeting">Olá, Gabriel!</h1>
+                <p id="current-date" style="color: var(--text-dim)"></p>
             </div>
         </div>
-    </div>
+
+        <div class="dashboard-grid">
+            <section class="section-card">
+                <h2>📅 Próximas Tarefas</h2>
+                <div class="input-box">
+                    <input type="text" id="taskInput" placeholder="Nova tarefa...">
+                    <button onclick="addItem('tasks', 'taskInput')">Add</button>
+                </div>
+                <div id="taskList" class="item-list"></div>
+            </section>
+
+            <section class="section-card">
+                <h2>📁 Arquivos Recentes</h2>
+                <p style="color: var(--text-dim); font-size: 0.8rem;">Adicione links do seu storage externo abaixo:</p>
+                <div class="input-box" style="flex-direction: column;">
+                    <input type="text" id="fileName" placeholder="Nome do arquivo (ex: Relatório)">
+                    <input type="text" id="fileUrl" placeholder="Link do Storage (Google Drive/Mega)">
+                    <button onclick="addFile()">Salvar Link</button>
+                </div>
+                <div id="fileList" class="item-list"></div>
+            </section>
+        </div>
+    </main>
 
     <script>
-        function addTask() {
-            const input = document.getElementById('taskInput');
-            if (!input.value) return;
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${input.value}</span> <span style="cursor:pointer" onclick="this.parentElement.remove()">❌</span>`;
-            document.getElementById('taskList').appendChild(li);
-            input.value = '';
+        // Inicialização de Datas
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+        // Banco de Dados Local (LocalStorage)
+        let db = JSON.parse(localStorage.getItem('organizador_db')) || { tasks: [], files: [], notes: [] };
+
+        function saveData() {
+            localStorage.setItem('organizador_db', JSON.stringify(db));
+            renderAll();
         }
+
+        function addItem(type, inputId) {
+            const val = document.getElementById(inputId).value;
+            if(!val) return;
+            db[type].push({ id: Date.now(), text: val, date: new Date().toLocaleString() });
+            document.getElementById(inputId).value = '';
+            saveData();
+        }
+
+        function addFile() {
+            const name = document.getElementById('fileName').value;
+            const url = document.getElementById('fileUrl').value;
+            if(!name || !url) return;
+            db.files.push({ id: Date.now(), name, url, date: new Date().toLocaleDateString() });
+            document.getElementById('fileName').value = '';
+            document.getElementById('fileUrl').value = '';
+            saveData();
+        }
+
+        function deleteItem(type, id) {
+            db[type] = db[type].filter(item => item.id !== id);
+            saveData();
+        }
+
+        function renderAll() {
+            // Render Tarefas
+            const taskDiv = document.getElementById('taskList');
+            taskDiv.innerHTML = db.tasks.map(t => `
+                <div class="list-entry">
+                    <div class="entry-info">
+                        <strong>${t.text}</strong>
+                        <span>Adicionado em: ${t.date}</span>
+                    </div>
+                    <button onclick="deleteItem('tasks', ${t.id})" style="background:#ef4444; padding:5px 10px;">X</button>
+                </div>
+            `).join('');
+
+            // Render Arquivos
+            const fileDiv = document.getElementById('fileList');
+            fileDiv.innerHTML = db.files.map(f => `
+                <a href="${f.url}" target="_blank" class="list-entry" style="text-decoration:none">
+                    <div class="entry-info">
+                        <strong>📄 ${f.name}</strong>
+                        <span>${f.date} • <span class="tag">Storage Externo</span></span>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        window.onload = renderAll;
     </script>
 </body>
 </html>
