@@ -1,50 +1,238 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Organizador Pessoal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>LifeHub • Organizador Pessoal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+    }
+    .app {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 220px;
+      background: #020617;
+      padding: 20px;
+    }
+    .sidebar h2 {
+      color: #60a5fa;
+      margin-bottom: 20px;
+    }
+    .sidebar button {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #1e293b;
+      border: none;
+      color: #e5e7eb;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .sidebar button:hover {
+      background: #334155;
+    }
+    .content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .card {
+      background: #020617;
+      padding: 20px;
+      border-radius: 12px;
+      min-width: 160px;
+      text-align: center;
+      font-size: 18px;
+    }
+    .page input, .page textarea {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      background: #1e293b;
+      border: none;
+      color: #fff;
+      border-radius: 6px;
+    }
+    .page button {
+      margin-top: 10px;
+      padding: 10px;
+      background: #3b82f6;
+      border: none;
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    ul {
+      margin-top: 15px;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 6px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 
-  <header>
-    <h1>📁 Organizador Pessoal</h1>
-    <p>Arquivos • Anotações • Cronogramas</p>
-  </header>
+<div class="app">
 
-  <main class="container">
+  <aside class="sidebar">
+    <h2>📂 LifeHub</h2>
+    <button onclick="showPage('dashboard')">Dashboard</button>
+    <button onclick="showPage('files')">Arquivos</button>
+    <button onclick="showPage('notes')">Anotações</button>
+    <button onclick="showPage('tasks')">Cronograma</button>
+  </aside>
 
-    <section class="card">
-      <h2>📝 Nova Anotação</h2>
-      <input type="text" id="title" placeholder="Título da anotação">
-      <textarea id="note" placeholder="Escreva sua anotação..."></textarea>
+  <main class="content">
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="page">
+      <h1>Dashboard</h1>
+      <div class="cards">
+        <div class="card">📁 Arquivos<br><strong id="countFiles">0</strong></div>
+        <div class="card">📝 Notas<br><strong id="countNotes">0</strong></div>
+        <div class="card">📅 Tarefas<br><strong id="countTasks">0</strong></div>
+      </div>
+    </section>
+
+    <!-- ARQUIVOS -->
+    <section id="files" class="page hidden">
+      <h1>Arquivos</h1>
+      <input type="file" id="fileInput">
+      <button onclick="saveFile()">Salvar arquivo</button>
+      <ul id="fileList"></ul>
+    </section>
+
+    <!-- ANOTAÇÕES -->
+    <section id="notes" class="page hidden">
+      <h1>Anotações</h1>
+      <input id="noteTitle" placeholder="Título">
+      <textarea id="noteText" placeholder="Escreva sua anotação..."></textarea>
       <button onclick="saveNote()">Salvar anotação</button>
+      <ul id="noteList"></ul>
     </section>
 
-    <section class="card">
-      <h2>📚 Anotações salvas</h2>
-      <ul id="notesList"></ul>
-    </section>
-
-    <section class="card">
-      <h2>📅 Nova tarefa</h2>
-      <input type="text" id="task" placeholder="Descrição da tarefa">
-      <input type="date" id="date">
+    <!-- TAREFAS -->
+    <section id="tasks" class="page hidden">
+      <h1>Cronograma</h1>
+      <input id="taskText" placeholder="Descrição da tarefa">
+      <input type="date" id="taskDate">
       <button onclick="saveTask()">Salvar tarefa</button>
-    </section>
-
-    <section class="card">
-      <h2>⏰ Tarefas</h2>
       <ul id="taskList"></ul>
     </section>
 
   </main>
+</div>
 
-  <footer>
-    <p>Organizador Pessoal • v1.0</p>
-  </footer>
+<script>
+  const files = JSON.parse(localStorage.getItem('files')) || [];
+  const notes = JSON.parse(localStorage.getItem('notes')) || [];
+  const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
-  <script src="script.js"></script>
+  const countFiles = document.getElementById('countFiles');
+  const countNotes = document.getElementById('countNotes');
+  const countTasks = document.getElementById('countTasks');
+
+  const fileList = document.getElementById('fileList');
+  const noteList = document.getElementById('noteList');
+  const taskList = document.getElementById('taskList');
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function updateDashboard() {
+    countFiles.textContent = files.length;
+    countNotes.textContent = notes.length;
+    countTasks.textContent = tasks.length;
+  }
+
+  function saveFile() {
+    const input = document.getElementById('fileInput');
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      files.push({ name: file.name, date: new Date().toLocaleString(), data: reader.result });
+      localStorage.setItem('files', JSON.stringify(files));
+      renderFiles();
+      updateDashboard();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderFiles() {
+    fileList.innerHTML = '';
+    files.forEach(f => {
+      const li = document.createElement('li');
+      li.textContent = `${f.name} — ${f.date}`;
+      fileList.appendChild(li);
+    });
+  }
+
+  function saveNote() {
+    const title = noteTitle.value;
+    const text = noteText.value;
+    if (!title || !text) return;
+
+    notes.push({ title, text, date: new Date().toLocaleString() });
+    localStorage.setItem('notes', JSON.stringify(notes));
+    renderNotes();
+    updateDashboard();
+  }
+
+  function renderNotes() {
+    noteList.innerHTML = '';
+    notes.forEach(n => {
+      const li = document.createElement('li');
+      li.textContent = `${n.title} — ${n.date}`;
+      noteList.appendChild(li);
+    });
+  }
+
+  function saveTask() {
+    const text = taskText.value;
+    const date = taskDate.value;
+    if (!text || !date) return;
+
+    tasks.push({ text, date });
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    renderTasks();
+    updateDashboard();
+  }
+
+  function renderTasks() {
+    taskList.innerHTML = '';
+    tasks.forEach(t => {
+      const li = document.createElement('li');
+      li.textContent = `${t.text} (${t.date})`;
+      taskList.appendChild(li);
+    });
+  }
+
+  renderFiles();
+  renderNotes();
+  renderTasks();
+  updateDashboard();
+</script>
+
 </body>
 </html>
