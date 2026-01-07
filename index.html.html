@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Organizador Pessoal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>📁 Organizador Pessoal</h1>
+    <p>Arquivos • Anotações • Cronogramas</p>
+  </header>
+
+  <main class="container">
+
+    <section class="card">
+      <h2>📝 Nova Anotação</h2>
+      <input type="text" id="title" placeholder="Título da anotação">
+      <textarea id="note" placeholder="Escreva sua anotação..."></textarea>
+      <button onclick="saveNote()">Salvar anotação</button>
+    </section>
+
+    <section class="card">
+      <h2>📚 Anotações salvas</h2>
+      <ul id="notesList"></ul>
+    </section>
+
+    <section class="card">
+      <h2>📅 Nova tarefa</h2>
+      <input type="text" id="task" placeholder="Descrição da tarefa">
+      <input type="date" id="date">
+      <button onclick="saveTask()">Salvar tarefa</button>
+    </section>
+
+    <section class="card">
+      <h2>⏰ Tarefas</h2>
+      <ul id="taskList"></ul>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Organizador Pessoal • v1.0</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
